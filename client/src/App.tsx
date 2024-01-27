@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { getConnection } from "./signalRConnection";
-import { Island, Views } from "./types";
-import { CreateIslandForm } from "./CreateIslandForm";
-import { MyIslands } from "./MyIslands";
+import { Empire, Views } from "./types";
+import { CreateEmpireForm } from "./CreateEmpireForm";
+import { MyEmpires } from "./MyEmpires";
+import { EmpireView } from "./EmpireView";
 
 function App() {
-  const [view, setView] = useState(Views.CreateIslandForm);
+  const [view, setView] = useState(Views.MyEmpires);
 
-  const initData: Island[] = [];
-  const [myIslands, setMyIslands] = useState(initData);
+  const initData: Empire[] = [];
+  const [myEmpires, setMyEmpires] = useState(initData);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   const switcher = (nextView: Views) => {
     setView(nextView);
@@ -16,14 +18,21 @@ function App() {
 
   return (
     <div className="App">
-      {view === Views.CreateIslandForm ? (
-        <CreateIslandForm
+      {view === Views.CreateEmpireForm ? (
+        <CreateEmpireForm
           switcher={switcher}
-          myIslands={myIslands}
-          setMyIslands={setMyIslands}
+          myEmpires={myEmpires}
+          setMyEmpires={setMyEmpires}
         />
-      ) : view === Views.MyIslands ? (
-        <MyIslands switcher={switcher} myIslands={myIslands} />
+      ) : view === Views.MyEmpires ? (
+        <MyEmpires
+          switcher={switcher}
+          myEmpires={myEmpires}
+          setMyEmpires={setMyEmpires}
+          setActiveId={setActiveId}
+        />
+      ) : view === Views.EmpireView && activeId ? (
+        <EmpireView switcher={switcher} id={activeId} />
       ) : (
         <p>o.o</p>
       )}

@@ -1,5 +1,5 @@
 import * as signalR from "@microsoft/signalr";
-import { Island } from "./types";
+import { Empire } from "./types";
 
 const URL = process.env.HUB_ADDRESS ?? "http://localhost:5209/api";
 
@@ -25,12 +25,24 @@ class Connector {
       .then((x) => console.log("sent"));
   };
 
-  public subIslandCreated = (callback: (island: Island) => void) => {
-    this.connection.on("islandCreated", callback);
+  public subEmpireCreated = (callback: (empire: Empire) => void) => {
+    this.connection.on("empireCreated", callback);
   };
 
-  public createIsland = (name: string) => {
-    this.connection.send("createIsland", name);
+  public createEmpire = (name: string) => {
+    this.connection.send("createEmpire", name);
+  };
+
+  public deleteEmpire = (id: string) => {
+    this.connection.send("deleteEmpire", id);
+  };
+
+  public syncEmpire = (id: string) => {
+    this.connection.send("syncEmpire", id);
+  };
+
+  public subEmpireSynced = (callback: (empire: Empire) => void) => {
+    this.connection.on("empireSynced", callback);
   };
 
   static instance: Connector;

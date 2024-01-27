@@ -10,16 +10,33 @@ public class GameHub : Hub
         await Clients.All.SendAsync("clientPong", message);
     }
 
-    public async Task CreateIsland(string name)
+    public async Task CreateEmpire(string name)
     {
-        Island island = new()
+        Empire empire = new()
         {
             Id = Guid.NewGuid(),
-            Name = name
+            Name = name,
+            LastUpdate = DateTime.UtcNow
         };
 
-        Repository.Islands.Add(island.Id, island);
+        Repository.Empires.Add(empire.Id, empire);
 
-        await Clients.Caller.SendAsync("islandCreated", island);
+        await Clients.Caller.SendAsync("empireCreated", empire);
+    }
+
+    public void DeleteEmpire(Guid id)
+    {
+        Repository.Empires.Remove(id);
+    }
+
+    public async Task SyncEmpire(Guid id)
+    {
+        if (Repository.Empires.ContainsKey(id))
+        {
+            Empire empire = Repository.Empires[id];
+            // TODO: Race conditions are a known issue.
+            Engine.UpdateEmpire(empire);
+            await Clients.Caller.SendAsync("empireSynced", empire);
+        }
     }
 }
