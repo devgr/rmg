@@ -13,16 +13,16 @@ export const MyIslands: React.FC<MyIslandsProps> = ({
 }) => {
   return (
     <>
-      <h1>My Islands</h1>
+      <p>My Islands</p>
+      <p>==========</p>
       <ul>
         {myIslands.map((i) => (
           <li>{i.name}</li>
         ))}
       </ul>
+      <br />
       <div>
-        <button onClick={() => switcher(Views.CreateIslandForm)}>
-          New Island
-        </button>
+        <a onClick={() => switcher(Views.CreateIslandForm)}>New Island...</a>
       </div>
     </>
   );

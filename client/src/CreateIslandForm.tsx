@@ -25,14 +25,14 @@ export const CreateIslandForm: React.FC<CreateIslandFormProps> = ({
 
   return (
     <>
-      <h1>Found a new island nation</h1>
+      <p>Found a new island nation</p>
       <input
         type="text"
         placeholder="Name of your island"
         value={name}
         onChange={(e) => setName(e.target.value)}
       ></input>
-      <button onClick={() => createIsland(name)}>Create Island</button>
+      <a onClick={() => createIsland(name)}>Create Island</a>
     </>
   );
 };

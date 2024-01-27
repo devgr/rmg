@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import "./App.css";
 import { getConnection } from "./signalRConnection";
 import { Island, Views } from "./types";
 import { CreateIslandForm } from "./CreateIslandForm";
