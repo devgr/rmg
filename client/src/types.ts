@@ -6,6 +6,11 @@ export enum Views {
 
 export type Switcher = (nextView: Views) => void;
 
+export type Notification = {
+  id: string;
+  message: string;
+};
+
 export type Empire = {
   id: string;
   name: string;
@@ -21,4 +26,13 @@ export type Empire = {
   soldiers: number;
   luxuryGoods: number;
   gold: number;
+  strength: number;
+
+  notifications: Notification[];
+};
+
+export type OtherEmpire = {
+  id: string;
+  name: string;
+  strength: number;
 };

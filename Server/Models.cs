@@ -17,4 +17,20 @@ public record Empire
     public int Soldiers { get; set; } = 0;
     public int LuxuryGoods { get; set; } = 0;
     public int Gold { get; set; } = 0;
+    public int Strength { get; set; } = 0;
+
+    public List<Notification> Notifications { get; set; } = [];
+}
+
+public record Notification
+{
+    public required Guid Id { get; set; }
+    public required string Message { get; set; }
+}
+
+public record OtherEmpire
+{
+    public required Guid Id { get; set; }
+    public required string Name { get; set; }
+    public int Strength { get; set; } = 0;
 }

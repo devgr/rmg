@@ -1,5 +1,5 @@
 import * as signalR from "@microsoft/signalr";
-import { Empire } from "./types";
+import { Empire, OtherEmpire } from "./types";
 
 const URL = process.env.HUB_ADDRESS ?? "http://localhost:5209/api";
 
@@ -21,6 +21,26 @@ class Connector {
     return () => {
       this.connection.off("empireSynced", callback);
     };
+  };
+
+  public subEmpiresRequested = (callback: (others: OtherEmpire[]) => void) => {
+    this.connection.on("empiresRequested", callback);
+
+    return () => {
+      this.connection.off("empiresRequested", callback);
+    };
+  };
+
+  public dismissNotification = (empireId: string, notificationId: string) => {
+    this.connection.send("dismissNotification", empireId, notificationId);
+  };
+
+  public requestEmpires = (id: string) => {
+    this.connection.send("requestEmpires", id);
+  };
+
+  public attack = (from: string, to: string, risk: number) => {
+    this.connection.send("attack", from, to, risk);
   };
 
   public createEmpire = (name: string) => {

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { getConnection } from "./signalRConnection";
 import { Switcher, Empire, Views } from "./types";
+import { War } from "./War";
+import { Notifications } from "./Notifications";
 
 type EmpireViewProps = {
   switcher: Switcher;
@@ -34,19 +36,20 @@ export const EmpireView: React.FC<EmpireViewProps> = ({ switcher, id }) => {
   const [luxuryGoodsShop, setLuxuryGoodsShop] = useState(1);
 
   const [showTips, setShowTips] = useState(false);
+  const [showWar, setShowWar] = useState(false);
+
+  const [notifications, setNotifications] = useState(empire?.notifications);
 
   useEffect(() => {
     if (!empire) {
-      console.log("calling initial sync");
       syncEmpire(id);
     }
   });
 
   useEffect(() => {
-    console.log("render");
     const cleanup = subEmpireSynced((i) => {
-      console.log("synced");
       setEmpire(i);
+      setNotifications(i.notifications);
     });
 
     return () => cleanup();
@@ -54,7 +57,6 @@ export const EmpireView: React.FC<EmpireViewProps> = ({ switcher, id }) => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      console.log("syncing");
       syncEmpire(id);
     }, 5001);
 
@@ -72,6 +74,11 @@ export const EmpireView: React.FC<EmpireViewProps> = ({ switcher, id }) => {
           <p>{empire.name}</p>
           <p>{[...empire.name].map((_) => "=")}</p>
           <br />
+          <Notifications
+            empire={empire}
+            notifications={notifications}
+            setNotifications={setNotifications}
+          />
           <table>
             <tbody>
               <tr>
@@ -330,6 +337,10 @@ export const EmpireView: React.FC<EmpireViewProps> = ({ switcher, id }) => {
               <li>Worst: Out of food</li>
             </ul>
           )}
+          <br />
+          <br />
+          <a onClick={() => setShowWar(!showWar)}>War...</a>
+          {showWar && <War id={id} empire={empire} />}
         </div>
       )}
     </>

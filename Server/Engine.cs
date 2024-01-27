@@ -29,7 +29,14 @@ public static class Engine
             empire.Energy -= min;
         }
 
+        empire.Strength = StrengthScore(empire);
+
         empire.LastUpdate = DateTime.UtcNow;
+    }
+
+    private static int StrengthScore(Empire empire)
+    {
+        return empire.Soldiers + empire.Gold / 2 + empire.Laughter / 10 + empire.Food / 10 + empire.Energy / 5;
     }
 
     private static int LaughterPerTick(Empire empire)

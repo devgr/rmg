@@ -23,6 +23,94 @@ public class GameHub : Hub
         Repository.Empires.Remove(id);
     }
 
+    public async void RequestEmpires(Guid except)
+    {
+        IEnumerable<OtherEmpire> others = Repository.Empires
+            .Where(x => x.Key != except && x.Value.Strength > 0)
+            .Select(x =>
+            {
+                return new OtherEmpire
+                {
+                    Id = x.Value.Id,
+                    Name = x.Value.Name,
+                    Strength = x.Value.Strength
+                };
+            });
+
+        await Clients.Caller.SendAsync("empiresRequested", others);
+    }
+
+    public async void Attack(Guid from, Guid to, int risk)
+    {
+        Empire me = Repository.Empires[from];
+        Empire them = Repository.Empires[to];
+
+        Random random = new();
+        double result = random.NextDouble();
+
+        double difference = (me.Strength - them.Strength) / (double)me.Strength;
+        double mitigationFactor = risk / 10.0;
+        double mitigatedDiff = difference * mitigationFactor;
+        result += mitigatedDiff;
+
+        double damageFactor = Math.Abs(result - .5);
+        string resultType = damageFactor > .25 ? "major" : "minor";
+
+        if (result > .5)
+        {
+            them.Soldiers = (int)(them.Soldiers * damageFactor);
+            them.Laughter = (int)(them.Laughter * damageFactor);
+
+            if (them.Soldiers <= 0)
+            {
+                them.Citizens = (int)(them.Citizens * damageFactor * .5);
+                them.Housing = (int)(them.Housing * damageFactor * .5);
+            }
+
+            them.Notifications.Add(new Notification
+            {
+                Id = Guid.NewGuid(),
+                Message = $"Your empire was attacked by {me.Name}! You suffered a {resultType} defeat."
+            });
+            me.Notifications.Add(new Notification
+            {
+                Id = Guid.NewGuid(),
+                Message = $"You attacked {them.Name}! You achieved a {resultType} victory."
+            });
+        }
+        else
+        {
+            me.Soldiers = (int)(me.Soldiers * damageFactor);
+            me.Laughter = (int)(me.Laughter * damageFactor);
+
+            if (me.Soldiers <= 0)
+            {
+                me.Citizens = (int)(me.Citizens * damageFactor * .5);
+                me.Housing = (int)(me.Housing * damageFactor * .5);
+            }
+
+            them.Notifications.Add(new Notification
+            {
+                Id = Guid.NewGuid(),
+                Message = $"Your empire was attacked by {me.Name}! You achieved a {resultType} victory."
+            });
+            me.Notifications.Add(new Notification
+            {
+                Id = Guid.NewGuid(),
+                Message = $"You attacked {them.Name}! You suffered a {resultType} defeat."
+            });
+        }
+
+        await Clients.Caller.SendAsync("empireSynced", me);
+        // TODO: send message to other
+    }
+
+    public void DismissNotification(Guid empireId, Guid notificationId)
+    {
+        Empire empire = Repository.Empires[empireId];
+        empire.Notifications.RemoveAll(x => x.Id == notificationId);
+    }
+
     public async Task SyncEmpire(Guid id)
     {
         // TODO validation of course
