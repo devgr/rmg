@@ -13,14 +13,16 @@ export const CreateEmpireForm: React.FC<CreateEmpireFormProps> = ({
   myEmpires,
   setMyEmpires,
 }) => {
-  const { createEmpire, subEmpireCreated } = getConnection();
+  const { createEmpire, subEmpireSynced } = getConnection();
   const [name, setName] = useState("");
 
   useEffect(() => {
-    subEmpireCreated((empire: Empire) => {
+    const cleanup = subEmpireSynced((empire: Empire) => {
       setMyEmpires([empire, ...myEmpires]);
       switcher(Views.MyEmpires);
     });
+
+    return () => cleanup();
   });
 
   return (
@@ -29,7 +31,8 @@ export const CreateEmpireForm: React.FC<CreateEmpireFormProps> = ({
         <a onClick={() => switcher(Views.MyEmpires)}>&#60; Back</a>
       </div>
       <br />
-      <p>Found a new empire nation</p>
+      <p>Found a new empire</p>
+      <br />
       <input
         type="text"
         placeholder="Name of your empire"

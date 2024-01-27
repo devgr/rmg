@@ -2,16 +2,16 @@ namespace Rmg;
 
 public static class Engine
 {
-    public const int TimeScale = 2; // Number of seconds per tick
+    public const int TimeScale = 5; // Number of seconds per tick
     public static void UpdateEmpire(Empire empire)
     {
         TimeSpan time = DateTime.UtcNow - empire.LastUpdate;
         int ticks = (int)time.TotalSeconds / TimeScale;
 
-        int foodRequired = (empire.Citizens + empire.Soldiers) * ticks;
+        int foodRequired = (empire.Citizens + empire.Soldiers) / 2 * ticks;
         empire.Food = foodRequired > empire.Food ? 0 : empire.Food - foodRequired;
 
-        int energyRequired = ((int)(empire.Citizens * .5) + empire.Soldiers) * ticks;
+        int energyRequired = ((int)(empire.Citizens * .25) + empire.Soldiers) * ticks;
         empire.Energy = energyRequired > empire.Energy ? 0 : empire.Energy - energyRequired;
 
         empire.Laughter += LaughterPerTick(empire) * ticks;
@@ -51,7 +51,7 @@ public static class Engine
             laughs *= .25;
 
         if (empire.Food <= 0)
-            laughs = 0;
+            laughs *= .1;
 
         if (empire.Gold >= 100 * empire.Citizens && empire.Gold < 1000 * empire.Citizens)
             laughs *= 1.5;

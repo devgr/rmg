@@ -15,18 +15,12 @@ class Connector {
     this.connection.start().catch((err) => console.error(err));
   }
 
-  public subscribeToClientPong = (callback: (message: string) => void) => {
-    this.connection.on("clientPong", callback);
-  };
+  public subEmpireSynced = (callback: (empire: Empire) => void) => {
+    this.connection.on("empireSynced", callback);
 
-  public serverPing = (messages: string) => {
-    this.connection
-      .send("serverPing", messages)
-      .then((x) => console.log("sent"));
-  };
-
-  public subEmpireCreated = (callback: (empire: Empire) => void) => {
-    this.connection.on("empireCreated", callback);
+    return () => {
+      this.connection.off("empireSynced", callback);
+    };
   };
 
   public createEmpire = (name: string) => {
@@ -41,8 +35,40 @@ class Connector {
     this.connection.send("syncEmpire", id);
   };
 
-  public subEmpireSynced = (callback: (empire: Empire) => void) => {
-    this.connection.on("empireSynced", callback);
+  public craftFood = (id: string, amount: number) => {
+    this.connection.send("craftFood", id, amount);
+  };
+
+  public craftHousing = (id: string, amount: number) => {
+    this.connection.send("craftHousing", id, amount);
+  };
+
+  public craftRawMaterials = (id: string, amount: number) => {
+    this.connection.send("craftRawMaterials", id, amount);
+  };
+
+  public craftEnergy = (id: string, amount: number) => {
+    this.connection.send("craftEnergy", id, amount);
+  };
+
+  public craftTools = (id: string, amount: number) => {
+    this.connection.send("craftTools", id, amount);
+  };
+
+  public craftManufacturedGoods = (id: string, amount: number) => {
+    this.connection.send("craftManufacturedGoods", id, amount);
+  };
+
+  public craftWeapons = (id: string, amount: number) => {
+    this.connection.send("craftWeapons", id, amount);
+  };
+
+  public craftSoldiers = (id: string, amount: number) => {
+    this.connection.send("craftSoldiers", id, amount);
+  };
+
+  public craftLuxuryGoods = (id: string, amount: number) => {
+    this.connection.send("craftLuxuryGoods", id, amount);
   };
 
   static instance: Connector;

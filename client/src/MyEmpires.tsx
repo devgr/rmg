@@ -37,7 +37,7 @@ export const MyEmpires: React.FC<MyEmpiresProps> = ({
       <table>
         <tbody>
           {myEmpires.map((i) => (
-            <tr>
+            <tr key={i.id}>
               <td>{i.name}</td>
               <td>&nbsp;</td>
               <td>

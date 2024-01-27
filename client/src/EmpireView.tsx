@@ -8,12 +8,57 @@ type EmpireViewProps = {
 };
 
 export const EmpireView: React.FC<EmpireViewProps> = ({ switcher, id }) => {
-  const { syncEmpire, subEmpireSynced } = getConnection();
+  const {
+    syncEmpire,
+    subEmpireSynced,
+    craftFood,
+    craftHousing,
+    craftRawMaterials,
+    craftEnergy,
+    craftTools,
+    craftManufacturedGoods,
+    craftWeapons,
+    craftSoldiers,
+    craftLuxuryGoods,
+  } = getConnection();
+
   const [empire, setEmpire] = useState<Empire | null>(null);
+  const [foodShop, setFoodShop] = useState(2);
+  const [housingShop, setHousingShop] = useState(1);
+  const [rawMaterialsShop, setRawMaterialsShop] = useState(1);
+  const [energyShop, setEnergyShop] = useState(1);
+  const [toolsShop, setToolsShop] = useState(1);
+  const [manufacturedGoodsShop, setManufacturedGoodsShop] = useState(1);
+  const [weaponsShop, setWeaponsShop] = useState(1);
+  const [soldiersShop, setSoldiersShop] = useState(1);
+  const [luxuryGoodsShop, setLuxuryGoodsShop] = useState(1);
+
+  const [showTips, setShowTips] = useState(false);
 
   useEffect(() => {
-    syncEmpire(id);
-    subEmpireSynced((i) => setEmpire(i));
+    if (!empire) {
+      console.log("calling initial sync");
+      syncEmpire(id);
+    }
+  });
+
+  useEffect(() => {
+    console.log("render");
+    const cleanup = subEmpireSynced((i) => {
+      console.log("synced");
+      setEmpire(i);
+    });
+
+    return () => cleanup();
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log("syncing");
+      syncEmpire(id);
+    }, 5001);
+
+    return () => clearInterval(interval);
   });
 
   return (
@@ -30,16 +75,24 @@ export const EmpireView: React.FC<EmpireViewProps> = ({ switcher, id }) => {
           <table>
             <tbody>
               <tr>
-                <td>Laughter</td>
-                <td>{empire.laughter}</td>
+                <td className={empire.laughter < 100 ? "warning" : ""}>
+                  {empire.laughter}
+                </td>
+                <td>
+                  <span className={"laughter"}>Laughter</span>
+                </td>
               </tr>
               <tr>
-                <td>Citizens</td>
                 <td>{empire.citizens}</td>
+                <td>
+                  <span className={"citizens"}>Citizens</span>
+                </td>
               </tr>
               <tr>
-                <td>Gold</td>
                 <td>{empire.gold}</td>
+                <td>
+                  <span className={"gold"}>Gold</span>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -47,60 +100,236 @@ export const EmpireView: React.FC<EmpireViewProps> = ({ switcher, id }) => {
           <table>
             <tbody>
               <tr>
-                <td>Food</td>
-                <td>{empire.food}</td>
-                <td>1 Laughter -&#62; 2 Food</td>
-              </tr>
-              <tr>
-                <td>Housing</td>
-                <td>{empire.housing}</td>
+                <td className={empire.food <= empire.citizens ? "warning" : ""}>
+                  {empire.food}
+                </td>
                 <td>
-                  2 Laughter + 2 Raw Materials + 2 Energy -&#62; 1 Housing
+                  <span className={"food"}>Food</span>
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={foodShop}
+                    onChange={(e) => setFoodShop(parseInt(e.target.value))}
+                  />
+                  <a onClick={() => craftFood(id, foodShop)}>Craft</a>
+                </td>
+                <td>
+                  1 <span className={"laughter"}>Laughter</span> -&#62; 2{" "}
+                  <span className={"food"}>Food</span>
                 </td>
               </tr>
               <tr>
-                <td>Raw Materials</td>
+                <td
+                  className={
+                    empire.energy <= empire.citizens / 2 ? "warning" : ""
+                  }
+                >
+                  {empire.energy}
+                </td>
+                <td>
+                  <span className={"energy"}>Energy</span>
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={energyShop}
+                    onChange={(e) => setEnergyShop(parseInt(e.target.value))}
+                  />
+                  <a onClick={() => craftEnergy(id, energyShop)}>Craft</a>
+                </td>
+                <td>
+                  1 <span className={"laughter"}>Laughter</span> -&#62; 1{" "}
+                  <span className={"energy"}>Energy</span>
+                </td>
+              </tr>
+              <tr>
                 <td>{empire.rawMaterials}</td>
-                <td>1 Laughter -&#62; 1 Raw Material</td>
+                <td>
+                  <span className={"raw-materials"}>Raw Materials</span>
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={rawMaterialsShop}
+                    onChange={(e) =>
+                      setRawMaterialsShop(parseInt(e.target.value))
+                    }
+                  />
+                  <a onClick={() => craftRawMaterials(id, rawMaterialsShop)}>
+                    Craft
+                  </a>
+                </td>
+                <td>
+                  1 <span className={"laughter"}>Laughter</span> -&#62; 1{" "}
+                  <span className={"raw-materials"}>Raw Material</span>
+                </td>
               </tr>
               <tr>
-                <td>Energy</td>
-                <td>{empire.energy}</td>
-                <td>1 Laughter -&#62; 1 Energy</td>
+                <td
+                  className={empire.housing < empire.citizens ? "warning" : ""}
+                >
+                  {empire.housing}
+                </td>
+                <td>
+                  <span className={"housing"}>Housing</span>
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={housingShop}
+                    onChange={(e) => setHousingShop(parseInt(e.target.value))}
+                  />
+                  <a onClick={() => craftHousing(id, housingShop)}>Craft</a>
+                </td>
+                <td>
+                  2 <span className={"laughter"}>Laughter</span> + 2{" "}
+                  <span className={"raw-materials"}>Raw Materials</span> + 2{" "}
+                  <span className={"energy"}>Energy</span> -&#62; 1{" "}
+                  <span className={"housing"}>Housing</span>
+                </td>
               </tr>
               <tr>
-                <td>Tools</td>
                 <td>{empire.tools}</td>
-                <td>2 Raw Materials + 2 Energy -&#62; 1 Tool</td>
+                <td>
+                  <span className={"tools"}>Tools</span>
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={toolsShop}
+                    onChange={(e) => setToolsShop(parseInt(e.target.value))}
+                  />
+                  <a onClick={() => craftTools(id, toolsShop)}>Craft</a>
+                </td>
+                <td>
+                  2 <span className={"raw-materials"}>Raw Materials</span> + 2{" "}
+                  <span className={"energy"}>Energy</span> -&#62; 1{" "}
+                  <span className={"tools"}>Tool</span>
+                </td>
               </tr>
               <tr>
-                <td>Manufactured Goods</td>
                 <td>{empire.manufacturedGoods}</td>
                 <td>
-                  2 Raw Materials + 2 Energy + 1 Tools -&#62; 1 Manufactured
-                  Good
+                  <span className={"manufactured-goods"}>
+                    Manufactured Goods
+                  </span>
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={manufacturedGoodsShop}
+                    onChange={(e) =>
+                      setManufacturedGoodsShop(parseInt(e.target.value))
+                    }
+                  />
+                  <a
+                    onClick={() =>
+                      craftManufacturedGoods(id, manufacturedGoodsShop)
+                    }
+                  >
+                    Craft
+                  </a>
+                </td>
+                <td>
+                  2 <span className={"raw-materials"}>Raw Materials</span> + 2{" "}
+                  <span className={"energy"}>Energy</span> + 1{" "}
+                  <span className={"tools"}>Tools</span> -&#62; 1{" "}
+                  <span className={"manufactured-goods"}>
+                    Manufactured Good
+                  </span>
                 </td>
               </tr>
               <tr>
-                <td>Weapons</td>
                 <td>{empire.weapons}</td>
-                <td>2 Manufactured Goods -&#62; 1 Weapon</td>
+                <td>
+                  <span className={"weapons"}>Weapons</span>
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={weaponsShop}
+                    onChange={(e) => setWeaponsShop(parseInt(e.target.value))}
+                  />
+                  <a onClick={() => craftWeapons(id, weaponsShop)}>Craft</a>
+                </td>
+                <td>
+                  2{" "}
+                  <span className={"manufactured-goods"}>
+                    Manufactured Goods
+                  </span>{" "}
+                  -&#62; 1 <span className={"weapons"}>Weapon</span>
+                </td>
               </tr>
               <tr>
-                <td>Soldiers</td>
                 <td>{empire.soldiers}</td>
-                <td>1 Citizen + 5 Laughter + 2 Energy -&#62; 1 Soldier</td>
+                <td>
+                  <span className={"soldiers"}>Soldiers</span>
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={soldiersShop}
+                    onChange={(e) => setSoldiersShop(parseInt(e.target.value))}
+                  />
+                  <a onClick={() => craftSoldiers(id, soldiersShop)}>Craft</a>
+                </td>
+                <td>
+                  1 <span className={"citizens"}>Citizen</span> + 5{" "}
+                  <span className={"laughter"}>Laughter</span> + 2{" "}
+                  <span className={"energy"}>Energy</span> -&#62; 1{" "}
+                  <span className={"soldiers"}>Soldier</span>
+                </td>
               </tr>
               <tr>
-                <td>Luxury Goods</td>
                 <td>{empire.luxuryGoods}</td>
                 <td>
-                  1 Manufactured Good + 3 Energy + 1 Raw Material -&#62; 1
-                  Luxury Good
+                  <span className={"luxury-goods"}>Luxury Goods</span>
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={luxuryGoodsShop}
+                    onChange={(e) =>
+                      setLuxuryGoodsShop(parseInt(e.target.value))
+                    }
+                  />
+                  <a onClick={() => craftLuxuryGoods(id, luxuryGoodsShop)}>
+                    Craft
+                  </a>
+                </td>
+                <td>
+                  1{" "}
+                  <span className={"manufactured-goods"}>
+                    Manufactured Good
+                  </span>{" "}
+                  + 3 <span className={"energy"}>Energy</span> + 1{" "}
+                  <span className={"raw-materials"}>Raw Material</span>
+                  -&#62; 1 <span className={"luxury-goods"}>Luxury Good</span>
                 </td>
               </tr>
             </tbody>
           </table>
+          <br />
+          <a onClick={() => setShowTips(!showTips)}>Tips...</a>
+          {showTips && (
+            <ul>
+              <li>Happy citizens laugh more.</li>
+              <li>Citizens use up food and energy.</li>
+              <li>
+                Get more citizens by having excess laughter, food, energy, and
+                housing.
+              </li>
+              <li>Good: Sufficient housing</li>
+              <li>Good: Luxury goods</li>
+              <li>Good: Gold</li>
+              <li>Bad: Too much gold</li>
+              <li>Bad: More soldiers than citizens</li>
+              <li>Bad: Insufficient housing</li>
+              <li>Very bad: Out of energy</li>
+              <li>Worst: Out of food</li>
+            </ul>
+          )}
         </div>
       )}
     </>

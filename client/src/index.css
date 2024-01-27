@@ -1,7 +1,7 @@
 * {
   font-family: monospace;
-  color: white;
-  font-size: 16pt;
+  color: #ddd;
+  font-size: 14pt;
   margin: 0;
 }
 
@@ -15,21 +15,73 @@ body {
 
 a {
   text-decoration: none;
-  color: white;
-  border: 2px solid white;
+  color: #ddd;
+  border: 2px solid #aaa;
 }
 
 a:hover {
   color: black;
-  background: white;
+  background: #ddd;
   cursor: pointer;
 }
 
 input {
   background: black;
-  border: 2px dashed white;
+  border: 2px dashed #ddd;
 }
 
 li {
   list-style: square;
+}
+
+.warning {
+  color: #ffeac1;
+}
+
+.laughter {
+  color: #84a0ac;
+}
+
+.citizens {
+  color: #91c0a4;
+}
+
+.food {
+  color: #ffcdc1;
+}
+
+.housing {
+  color: #ffdcc1;
+}
+
+.raw-materials {
+  color: #8d9ab5;
+}
+
+.energy {
+  color: #7ea7a6;
+}
+
+.tools {
+  color: #ffe6c1;
+}
+
+.manufactured-goods {
+  color: #fff1c1;
+}
+
+.weapons {
+  color: #9794bb;
+}
+
+.soldiers {
+  color: #899cb1;
+}
+
+.luxury-goods {
+  color: #9e8fb8;
+}
+
+.gold {
+  color: #ffe2c1;
 }
