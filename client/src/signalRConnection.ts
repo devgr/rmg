@@ -91,6 +91,42 @@ class Connector {
     this.connection.send("craftLuxuryGoods", id, amount);
   };
 
+  public giftFood = (from: string, to: string, amount: number) => {
+    this.connection.send("giftFood", from, to, amount);
+  };
+
+  public giftHousing = (from: string, to: string, amount: number) => {
+    this.connection.send("giftHousing", from, to, amount);
+  };
+
+  public giftRawMaterials = (from: string, to: string, amount: number) => {
+    this.connection.send("giftRawMaterials", from, to, amount);
+  };
+
+  public giftEnergy = (from: string, to: string, amount: number) => {
+    this.connection.send("giftEnergy", from, to, amount);
+  };
+
+  public giftTools = (from: string, to: string, amount: number) => {
+    this.connection.send("giftTools", from, to, amount);
+  };
+
+  public giftManufacturedGoods = (from: string, to: string, amount: number) => {
+    this.connection.send("giftManufacturedGoods", from, to, amount);
+  };
+
+  public giftWeapons = (from: string, to: string, amount: number) => {
+    this.connection.send("giftWeapons", from, to, amount);
+  };
+
+  public giftSoldiers = (from: string, to: string, amount: number) => {
+    this.connection.send("giftSoldiers", from, to, amount);
+  };
+
+  public giftLuxuryGoods = (from: string, to: string, amount: number) => {
+    this.connection.send("giftLuxuryGoods", from, to, amount);
+  };
+
   static instance: Connector;
 
   public static getInstance(): Connector {

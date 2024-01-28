@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { getConnection } from "./signalRConnection";
-import { Switcher, Empire, Views } from "./types";
+import { Switcher, Empire, Views, OtherEmpire } from "./types";
 import { War } from "./War";
 import { Notifications } from "./Notifications";
+import { Gift } from "./Gift";
 
 type EmpireViewProps = {
   switcher: Switcher;
@@ -22,6 +23,8 @@ export const EmpireView: React.FC<EmpireViewProps> = ({ switcher, id }) => {
     craftWeapons,
     craftSoldiers,
     craftLuxuryGoods,
+    requestEmpires,
+    subEmpiresRequested,
   } = getConnection();
 
   const [empire, setEmpire] = useState<Empire | null>(null);
@@ -61,6 +64,22 @@ export const EmpireView: React.FC<EmpireViewProps> = ({ switcher, id }) => {
     }, 5001);
 
     return () => clearInterval(interval);
+  });
+
+  const [otherEmpires, setOtherEmpires] = useState<OtherEmpire[] | null>(null);
+
+  useEffect(() => {
+    if (!otherEmpires) {
+      requestEmpires(id);
+    }
+  });
+
+  useEffect(() => {
+    const cleanup = subEmpiresRequested((others: OtherEmpire[]) => {
+      setOtherEmpires(others);
+    });
+
+    return () => cleanup();
   });
 
   return (
@@ -119,8 +138,18 @@ export const EmpireView: React.FC<EmpireViewProps> = ({ switcher, id }) => {
                     value={foodShop}
                     onChange={(e) => setFoodShop(parseInt(e.target.value))}
                   />
-                  <a onClick={() => craftFood(id, foodShop)}>Craft</a>
+                  &nbsp;<a onClick={() => craftFood(id, foodShop)}>Craft</a>
+                  &nbsp;
+                  {otherEmpires && (
+                    <Gift
+                      id={id}
+                      others={otherEmpires}
+                      value={foodShop}
+                      resource={"food"}
+                    />
+                  )}
                 </td>
+                <td>&nbsp;</td>
                 <td>
                   1 <span className={"laughter"}>Laughter</span> -&#62; 2{" "}
                   <span className={"food"}>Food</span>
@@ -143,8 +172,18 @@ export const EmpireView: React.FC<EmpireViewProps> = ({ switcher, id }) => {
                     value={energyShop}
                     onChange={(e) => setEnergyShop(parseInt(e.target.value))}
                   />
-                  <a onClick={() => craftEnergy(id, energyShop)}>Craft</a>
+                  &nbsp;<a onClick={() => craftEnergy(id, energyShop)}>Craft</a>
+                  &nbsp;
+                  {otherEmpires && (
+                    <Gift
+                      id={id}
+                      others={otherEmpires}
+                      value={foodShop}
+                      resource={"energy"}
+                    />
+                  )}
                 </td>
+                <td>&nbsp;</td>
                 <td>
                   1 <span className={"laughter"}>Laughter</span> -&#62; 1{" "}
                   <span className={"energy"}>Energy</span>
@@ -163,10 +202,21 @@ export const EmpireView: React.FC<EmpireViewProps> = ({ switcher, id }) => {
                       setRawMaterialsShop(parseInt(e.target.value))
                     }
                   />
+                  &nbsp;
                   <a onClick={() => craftRawMaterials(id, rawMaterialsShop)}>
                     Craft
                   </a>
+                  &nbsp;
+                  {otherEmpires && (
+                    <Gift
+                      id={id}
+                      others={otherEmpires}
+                      value={foodShop}
+                      resource={"rawMaterials"}
+                    />
+                  )}
                 </td>
+                <td>&nbsp;</td>
                 <td>
                   1 <span className={"laughter"}>Laughter</span> -&#62; 1{" "}
                   <span className={"raw-materials"}>Raw Material</span>
@@ -187,8 +237,19 @@ export const EmpireView: React.FC<EmpireViewProps> = ({ switcher, id }) => {
                     value={housingShop}
                     onChange={(e) => setHousingShop(parseInt(e.target.value))}
                   />
+                  &nbsp;
                   <a onClick={() => craftHousing(id, housingShop)}>Craft</a>
+                  &nbsp;
+                  {otherEmpires && (
+                    <Gift
+                      id={id}
+                      others={otherEmpires}
+                      value={foodShop}
+                      resource={"housing"}
+                    />
+                  )}
                 </td>
+                <td>&nbsp;</td>
                 <td>
                   2 <span className={"laughter"}>Laughter</span> + 2{" "}
                   <span className={"raw-materials"}>Raw Materials</span> + 2{" "}
@@ -207,8 +268,18 @@ export const EmpireView: React.FC<EmpireViewProps> = ({ switcher, id }) => {
                     value={toolsShop}
                     onChange={(e) => setToolsShop(parseInt(e.target.value))}
                   />
-                  <a onClick={() => craftTools(id, toolsShop)}>Craft</a>
+                  &nbsp;<a onClick={() => craftTools(id, toolsShop)}>Craft</a>
+                  &nbsp;
+                  {otherEmpires && (
+                    <Gift
+                      id={id}
+                      others={otherEmpires}
+                      value={foodShop}
+                      resource={"tools"}
+                    />
+                  )}
                 </td>
+                <td>&nbsp;</td>
                 <td>
                   2 <span className={"raw-materials"}>Raw Materials</span> + 2{" "}
                   <span className={"energy"}>Energy</span> -&#62; 1{" "}
@@ -230,6 +301,7 @@ export const EmpireView: React.FC<EmpireViewProps> = ({ switcher, id }) => {
                       setManufacturedGoodsShop(parseInt(e.target.value))
                     }
                   />
+                  &nbsp;
                   <a
                     onClick={() =>
                       craftManufacturedGoods(id, manufacturedGoodsShop)
@@ -237,7 +309,17 @@ export const EmpireView: React.FC<EmpireViewProps> = ({ switcher, id }) => {
                   >
                     Craft
                   </a>
+                  &nbsp;
+                  {otherEmpires && (
+                    <Gift
+                      id={id}
+                      others={otherEmpires}
+                      value={foodShop}
+                      resource={"manufacturedGoods"}
+                    />
+                  )}
                 </td>
+                <td>&nbsp;</td>
                 <td>
                   2 <span className={"raw-materials"}>Raw Materials</span> + 2{" "}
                   <span className={"energy"}>Energy</span> + 1{" "}
@@ -258,8 +340,19 @@ export const EmpireView: React.FC<EmpireViewProps> = ({ switcher, id }) => {
                     value={weaponsShop}
                     onChange={(e) => setWeaponsShop(parseInt(e.target.value))}
                   />
+                  &nbsp;
                   <a onClick={() => craftWeapons(id, weaponsShop)}>Craft</a>
+                  &nbsp;
+                  {otherEmpires && (
+                    <Gift
+                      id={id}
+                      others={otherEmpires}
+                      value={foodShop}
+                      resource={"weapons"}
+                    />
+                  )}
                 </td>
+                <td>&nbsp;</td>
                 <td>
                   2{" "}
                   <span className={"manufactured-goods"}>
@@ -279,8 +372,19 @@ export const EmpireView: React.FC<EmpireViewProps> = ({ switcher, id }) => {
                     value={soldiersShop}
                     onChange={(e) => setSoldiersShop(parseInt(e.target.value))}
                   />
+                  &nbsp;
                   <a onClick={() => craftSoldiers(id, soldiersShop)}>Craft</a>
+                  &nbsp;
+                  {otherEmpires && (
+                    <Gift
+                      id={id}
+                      others={otherEmpires}
+                      value={foodShop}
+                      resource={"soldiers"}
+                    />
+                  )}
                 </td>
+                <td>&nbsp;</td>
                 <td>
                   1 <span className={"citizens"}>Citizen</span> + 5{" "}
                   <span className={"laughter"}>Laughter</span> + 2{" "}
@@ -301,10 +405,21 @@ export const EmpireView: React.FC<EmpireViewProps> = ({ switcher, id }) => {
                       setLuxuryGoodsShop(parseInt(e.target.value))
                     }
                   />
+                  &nbsp;
                   <a onClick={() => craftLuxuryGoods(id, luxuryGoodsShop)}>
                     Craft
                   </a>
+                  &nbsp;
+                  {otherEmpires && (
+                    <Gift
+                      id={id}
+                      others={otherEmpires}
+                      value={foodShop}
+                      resource={"luxuryGoods"}
+                    />
+                  )}
                 </td>
+                <td>&nbsp;</td>
                 <td>
                   1{" "}
                   <span className={"manufactured-goods"}>

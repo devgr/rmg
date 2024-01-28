@@ -13,13 +13,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
+a,
+details[data-popover] > summary {
   text-decoration: none;
   color: #ddd;
   border: 2px solid #aaa;
 }
 
-a:hover {
+a:hover,
+details[data-popover] > summary:hover {
   color: black;
   background: #ddd;
   cursor: pointer;
@@ -85,3 +87,45 @@ li {
 .gold {
   color: #ffe2c1;
 }
+
+/* popover */
+details[data-popover] {
+  display: inline;
+  position: relative;
+}
+details[data-popover] > summary:focus {
+  outline: none;
+}
+details[data-popover] > summary::-webkit-details-marker {
+  display: none;
+}
+details[data-popover] > summary {
+  list-style: none;
+}
+details[data-popover] > div p {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+details[data-popover] > summary + * {
+  position: absolute;
+  display: block;
+  z-index: 1;
+  border: solid 1px #aaa;
+  padding: 15px;
+  background: black;
+}
+details[data-popover] > * + * {
+  /* hide detail elements that would ruin the popover */
+  display: none;
+}
+details[data-popover="down"] > summary + * {
+  top: calc(0.5rem + 100%);
+  right: 50%;
+  transform: translateX(50%);
+}
+
+/* wrapper setup */
+/* .wrapper {
+  width: 100%;
+  padding: 250px;
+} */

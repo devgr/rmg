@@ -4,6 +4,7 @@ namespace Rmg;
 
 public class GameHub : Hub
 {
+    private static Dictionary<Guid, string> empireClientMap = [];
     public async Task CreateEmpire(string name)
     {
         Empire empire = new()
@@ -14,6 +15,8 @@ public class GameHub : Hub
         };
 
         Repository.Empires.Add(empire.Id, empire);
+
+        empireClientMap.Add(empire.Id, Context.ConnectionId);
 
         await Clients.Caller.SendAsync("empireSynced", empire);
     }
@@ -101,8 +104,15 @@ public class GameHub : Hub
             });
         }
 
+        Engine.UpdateEmpire(me);
+        Engine.UpdateEmpire(them);
+
         await Clients.Caller.SendAsync("empireSynced", me);
-        // TODO: send message to other
+
+        string theirClientId = empireClientMap[them.Id];
+        var client = Clients.Clients(theirClientId);
+        if (client is not null)
+            await client.SendAsync("empireSynced", them);
     }
 
     public void DismissNotification(Guid empireId, Guid notificationId)
@@ -278,6 +288,141 @@ public class GameHub : Hub
             empire.ManufacturedGoods -= manufacturedCost;
 
             await Clients.Caller.SendAsync("empireSynced", empire);
+        }
+    }
+
+    private async Task SyncEmpire(Empire other)
+    {
+        string theirClientId = empireClientMap[other.Id];
+        var client = Clients.Clients(theirClientId);
+        if (client is not null)
+            await client.SendAsync("empireSynced", other);
+    }
+
+    public async Task GiftFood(Guid from, Guid to, int amount)
+    {
+        Empire me = Repository.Empires[from];
+        Empire them = Repository.Empires[to];
+
+        if (me.Food >= amount)
+        {
+            me.Food -= amount;
+            them.Food += amount;
+            await Clients.Caller.SendAsync("empireSynced", me);
+
+            await SyncEmpire(them);
+        }
+    }
+    public async Task GiftHousing(Guid from, Guid to, int amount)
+    {
+        Empire me = Repository.Empires[from];
+        Empire them = Repository.Empires[to];
+
+        if (me.Housing >= amount)
+        {
+            me.Housing -= amount;
+            them.Housing += amount;
+            await Clients.Caller.SendAsync("empireSynced", me);
+
+            await SyncEmpire(them);
+        }
+    }
+    public async Task GiftRawMaterials(Guid from, Guid to, int amount)
+    {
+        Empire me = Repository.Empires[from];
+        Empire them = Repository.Empires[to];
+
+        if (me.RawMaterials >= amount)
+        {
+            me.RawMaterials -= amount;
+            them.RawMaterials += amount;
+            await Clients.Caller.SendAsync("empireSynced", me);
+
+            await SyncEmpire(them);
+        }
+    }
+    public async Task GiftEnergy(Guid from, Guid to, int amount)
+    {
+        Empire me = Repository.Empires[from];
+        Empire them = Repository.Empires[to];
+
+        if (me.Energy >= amount)
+        {
+            me.Energy -= amount;
+            them.Energy += amount;
+            await Clients.Caller.SendAsync("empireSynced", me);
+
+            await SyncEmpire(them);
+        }
+    }
+    public async Task GiftTools(Guid from, Guid to, int amount)
+    {
+        Empire me = Repository.Empires[from];
+        Empire them = Repository.Empires[to];
+
+        if (me.Tools >= amount)
+        {
+            me.Tools -= amount;
+            them.Tools += amount;
+            await Clients.Caller.SendAsync("empireSynced", me);
+
+            await SyncEmpire(them);
+        }
+    }
+    public async Task GiftManufacturedGoods(Guid from, Guid to, int amount)
+    {
+        Empire me = Repository.Empires[from];
+        Empire them = Repository.Empires[to];
+
+        if (me.ManufacturedGoods >= amount)
+        {
+            me.ManufacturedGoods -= amount;
+            them.ManufacturedGoods += amount;
+            await Clients.Caller.SendAsync("empireSynced", me);
+
+            await SyncEmpire(them);
+        }
+    }
+    public async Task GiftWeapons(Guid from, Guid to, int amount)
+    {
+        Empire me = Repository.Empires[from];
+        Empire them = Repository.Empires[to];
+
+        if (me.Weapons >= amount)
+        {
+            me.Weapons -= amount;
+            them.Weapons += amount;
+            await Clients.Caller.SendAsync("empireSynced", me);
+
+            await SyncEmpire(them);
+        }
+    }
+    public async Task GiftSoldiers(Guid from, Guid to, int amount)
+    {
+        Empire me = Repository.Empires[from];
+        Empire them = Repository.Empires[to];
+
+        if (me.Soldiers >= amount)
+        {
+            me.Soldiers -= amount;
+            them.Soldiers += amount;
+            await Clients.Caller.SendAsync("empireSynced", me);
+
+            await SyncEmpire(them);
+        }
+    }
+    public async Task GiftLuxuryGoods(Guid from, Guid to, int amount)
+    {
+        Empire me = Repository.Empires[from];
+        Empire them = Repository.Empires[to];
+
+        if (me.LuxuryGoods >= amount)
+        {
+            me.LuxuryGoods -= amount;
+            them.LuxuryGoods += amount;
+            await Clients.Caller.SendAsync("empireSynced", me);
+
+            await SyncEmpire(them);
         }
     }
 }

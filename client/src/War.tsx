@@ -29,6 +29,7 @@ export const War: React.FC<WarProps> = ({ id, empire }) => {
 
   const attackClicked = (to: string) => {
     attack(empire.id, to, risk);
+    setOtherEmpires(null);
   };
 
   return (
