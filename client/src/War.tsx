@@ -48,7 +48,8 @@ export const War: React.FC<WarProps> = ({ id, empire }) => {
         <table>
           <thead>
             <tr>
-              <th>Name:</th>
+              <th>Emperor:</th>
+              <th>Empire:</th>
               <th>Strength:</th>
               <th>&nbsp;</th>
               <th>Actions</th>
@@ -57,8 +58,9 @@ export const War: React.FC<WarProps> = ({ id, empire }) => {
           <tbody>
             {otherEmpires.map((x) => (
               <tr key={x.id}>
-                <td>{x.name}</td>
-                <td>{x.strength}</td>
+                <td>{x.username}&nbsp;</td>
+                <td>&nbsp;{x.name}&nbsp;</td>
+                <td>&nbsp;{x.strength}</td>
                 <td>&nbsp;</td>
                 <td>
                   <a onClick={() => attackClicked(x.id)}>Attack!</a>

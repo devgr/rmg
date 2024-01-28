@@ -56,24 +56,14 @@ public class GameHub : Hub
 
     public async Task RequestMyEmpires(Guid userId)
     {
-        Console.WriteLine(userId);
         List<Guid> empireIds = userEmpireMap[userId];
-        foreach (var id in empireIds)
-        {
-            Console.WriteLine(id);
-        }
         List<Empire> empires = empireIds.Select(x => Repository.Empires[x]).ToList();
-        foreach (var e in empires)
-        {
-            Console.WriteLine(e.Name);
-        }
 
         await Clients.Caller.SendAsync("myEmpiresRequested", empires);
     }
 
     public async Task CreateEmpire(string name, Guid userId)
     {
-        Console.WriteLine(userId);
         User user = Repository.Users[userId];
         Empire empire = new()
         {

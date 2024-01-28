@@ -48,8 +48,8 @@ export const MyEmpires: React.FC<MyEmpiresProps> = ({
   return (
     myEmpires && (
       <>
-        <p>My Empires</p>
-        <p>==========</p>
+        <p>{user.username}'s Empires</p>
+        <p>{[...`${user.username}'s Empires`].map((_) => "=")}</p>
         <table>
           <tbody>
             {myEmpires.map((i) => (

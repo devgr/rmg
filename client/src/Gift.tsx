@@ -47,7 +47,9 @@ export const Gift: React.FC<GiftProps> = ({ id, others, value, resource }) => {
       <div>
         {others.map((x) => (
           <p key={x.id}>
-            <a onClick={() => clicked(x.id)}>{x.name}</a>
+            <a onClick={() => clicked(x.id)}>
+              {x.username} - {x.name}
+            </a>
           </p>
         ))}
       </div>
