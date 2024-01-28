@@ -127,6 +127,34 @@ class Connector {
     this.connection.send("giftLuxuryGoods", from, to, amount);
   };
 
+  public buySellFood = (id: string, quantity: number) => {
+    this.connection.send("buySellFood", id, quantity);
+  };
+
+  public buySellRawMaterials = (id: string, quantity: number) => {
+    this.connection.send("buySellRawMaterials", id, quantity);
+  };
+
+  public buySellEnergy = (id: string, quantity: number) => {
+    this.connection.send("buySellEnergy", id, quantity);
+  };
+
+  public buySellTools = (id: string, quantity: number) => {
+    this.connection.send("buySellTools", id, quantity);
+  };
+
+  public buySellManufacturedGoods = (id: string, quantity: number) => {
+    this.connection.send("buySellManufacturedGoods", id, quantity);
+  };
+
+  public buySellWeapons = (id: string, quantity: number) => {
+    this.connection.send("buySellWeapons", id, quantity);
+  };
+
+  public buySellLuxuryGoods = (id: string, quantity: number) => {
+    this.connection.send("buySellLuxuryGoods", id, quantity);
+  };
+
   static instance: Connector;
 
   public static getInstance(): Connector {

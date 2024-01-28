@@ -4,6 +4,7 @@ import { Switcher, Empire, Views, OtherEmpire } from "./types";
 import { War } from "./War";
 import { Notifications } from "./Notifications";
 import { Gift } from "./Gift";
+import { Marketplace } from "./Marketplace";
 
 type EmpireViewProps = {
   switcher: Switcher;
@@ -40,6 +41,7 @@ export const EmpireView: React.FC<EmpireViewProps> = ({ switcher, id }) => {
 
   const [showTips, setShowTips] = useState(false);
   const [showWar, setShowWar] = useState(false);
+  const [showMarketplace, setShowMarketplace] = useState(false);
 
   const [notifications, setNotifications] = useState(empire?.notifications);
 
@@ -456,6 +458,12 @@ export const EmpireView: React.FC<EmpireViewProps> = ({ switcher, id }) => {
           <br />
           <a onClick={() => setShowWar(!showWar)}>War...</a>
           {showWar && <War id={id} empire={empire} />}
+          <br />
+          <br />
+          <a onClick={() => setShowMarketplace(!showMarketplace)}>
+            Marketplace...
+          </a>
+          {showMarketplace && <Marketplace id={id} prices={empire.prices} />}
         </div>
       )}
     </>

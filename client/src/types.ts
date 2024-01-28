@@ -11,6 +11,16 @@ export type Notification = {
   message: string;
 };
 
+export type MarketplacePrices = {
+  food: number;
+  rawMaterials: number;
+  energy: number;
+  tools: number;
+  manufacturedGoods: number;
+  weapons: number;
+  luxuryGoods: number;
+};
+
 export type Empire = {
   id: string;
   name: string;
@@ -29,6 +39,7 @@ export type Empire = {
   strength: number;
 
   notifications: Notification[];
+  prices: MarketplacePrices;
 };
 
 export type OtherEmpire = {

@@ -11,7 +11,8 @@ public class GameHub : Hub
         {
             Id = Guid.NewGuid(),
             Name = name,
-            LastUpdate = DateTime.UtcNow
+            LastUpdate = DateTime.UtcNow,
+            Prices = Repository.Prices
         };
 
         Repository.Empires.Add(empire.Id, empire);
@@ -423,6 +424,142 @@ public class GameHub : Hub
             await Clients.Caller.SendAsync("empireSynced", me);
 
             await SyncEmpire(them);
+        }
+    }
+
+    public async Task BuySellFood(Guid id, int quantity)
+    {
+        // quantity to buy. negative means sell.
+        Empire empire = Repository.Empires[id];
+
+        int absQuantity = Math.Abs(quantity);
+        int unitPrice = Repository.Prices.Food;
+        int price = Repository.Prices.Food * absQuantity;
+        if (quantity < 0 && empire.Food >= absQuantity || quantity > 0 && empire.Gold >= price)
+        {
+            empire.Gold -= unitPrice * quantity;
+            empire.Food += quantity;
+
+            Repository.RecordHistory(Repository.History.Food, DateTime.UtcNow, quantity);
+            Repository.Tracking.Food = Repository.CalcPrice(Repository.History.Food, Repository.Tracking.Food);
+            Repository.Prices.Food = (int)Repository.Tracking.Food;
+
+            await Clients.Caller.SendAsync("empireSynced", empire);
+        }
+    }
+
+    public async Task BuySellRawMaterials(Guid id, int quantity)
+    {
+        Empire empire = Repository.Empires[id];
+
+        int absQuantity = Math.Abs(quantity);
+        int unitPrice = Repository.Prices.RawMaterials;
+        int price = Repository.Prices.RawMaterials * absQuantity;
+        if (quantity < 0 && empire.RawMaterials >= quantity || quantity > 0 && empire.Gold >= price)
+        {
+            empire.Gold -= unitPrice * quantity;
+            empire.RawMaterials += quantity;
+
+            Repository.RecordHistory(Repository.History.RawMaterials, DateTime.UtcNow, quantity);
+            Repository.Tracking.RawMaterials = Repository.CalcPrice(Repository.History.RawMaterials, Repository.Tracking.RawMaterials);
+            Repository.Prices.RawMaterials = (int)Repository.Tracking.RawMaterials;
+
+            await Clients.Caller.SendAsync("empireSynced", empire);
+        }
+    }
+    public async Task BuySellEnergy(Guid id, int quantity)
+    {
+        Empire empire = Repository.Empires[id];
+
+        int absQuantity = Math.Abs(quantity);
+        int unitPrice = Repository.Prices.Energy;
+        int price = Repository.Prices.Energy * absQuantity;
+        if (quantity < 0 && empire.Energy >= quantity || quantity > 0 && empire.Gold >= price)
+        {
+            empire.Gold -= unitPrice * quantity;
+            empire.Energy += quantity;
+
+            Repository.RecordHistory(Repository.History.Energy, DateTime.UtcNow, quantity);
+            Repository.Tracking.Energy = Repository.CalcPrice(Repository.History.Energy, Repository.Tracking.Energy);
+            Repository.Prices.Energy = (int)Repository.Tracking.Energy;
+
+            await Clients.Caller.SendAsync("empireSynced", empire);
+        }
+    }
+    public async Task BuySellTools(Guid id, int quantity)
+    {
+        Empire empire = Repository.Empires[id];
+
+        int absQuantity = Math.Abs(quantity);
+        int unitPrice = Repository.Prices.Tools;
+        int price = Repository.Prices.Tools * absQuantity;
+        if (quantity < 0 && empire.Tools >= quantity || quantity > 0 && empire.Gold >= price)
+        {
+            empire.Gold -= unitPrice * quantity;
+            empire.Tools += quantity;
+
+            Repository.RecordHistory(Repository.History.Tools, DateTime.UtcNow, quantity);
+            Repository.Tracking.Tools = Repository.CalcPrice(Repository.History.Tools, Repository.Tracking.Tools);
+            Repository.Prices.Tools = (int)Repository.Tracking.Tools;
+
+            await Clients.Caller.SendAsync("empireSynced", empire);
+        }
+    }
+    public async Task BuySellManufacturedGoods(Guid id, int quantity)
+    {
+        Empire empire = Repository.Empires[id];
+
+        int absQuantity = Math.Abs(quantity);
+        int unitPrice = Repository.Prices.ManufacturedGoods;
+        int price = Repository.Prices.ManufacturedGoods * absQuantity;
+        if (quantity < 0 && empire.ManufacturedGoods >= quantity || quantity > 0 && empire.Gold >= price)
+        {
+            empire.Gold -= unitPrice * quantity;
+            empire.ManufacturedGoods += quantity;
+
+            Repository.RecordHistory(Repository.History.ManufacturedGoods, DateTime.UtcNow, quantity);
+            Repository.Tracking.ManufacturedGoods = Repository.CalcPrice(Repository.History.ManufacturedGoods, Repository.Tracking.ManufacturedGoods);
+            Repository.Prices.ManufacturedGoods = (int)Repository.Tracking.ManufacturedGoods;
+
+            await Clients.Caller.SendAsync("empireSynced", empire);
+        }
+    }
+    public async Task BuySellWeapons(Guid id, int quantity)
+    {
+        Empire empire = Repository.Empires[id];
+
+        int absQuantity = Math.Abs(quantity);
+        int unitPrice = Repository.Prices.Weapons;
+        int price = Repository.Prices.Weapons * absQuantity;
+        if (quantity < 0 && empire.Weapons >= quantity || quantity > 0 && empire.Gold >= price)
+        {
+            empire.Gold -= unitPrice * quantity;
+            empire.Weapons += quantity;
+
+            Repository.RecordHistory(Repository.History.Weapons, DateTime.UtcNow, quantity);
+            Repository.Tracking.Weapons = Repository.CalcPrice(Repository.History.Weapons, Repository.Tracking.Weapons);
+            Repository.Prices.Weapons = (int)Repository.Tracking.Weapons;
+
+            await Clients.Caller.SendAsync("empireSynced", empire);
+        }
+    }
+    public async Task BuySellLuxuryGoods(Guid id, int quantity)
+    {
+        Empire empire = Repository.Empires[id];
+
+        int absQuantity = Math.Abs(quantity);
+        int unitPrice = Repository.Prices.LuxuryGoods;
+        int price = Repository.Prices.LuxuryGoods * absQuantity;
+        if (quantity < 0 && empire.LuxuryGoods >= quantity || quantity > 0 && empire.Gold >= price)
+        {
+            empire.Gold -= unitPrice * quantity;
+            empire.LuxuryGoods += quantity;
+
+            Repository.RecordHistory(Repository.History.LuxuryGoods, DateTime.UtcNow, quantity);
+            Repository.Tracking.LuxuryGoods = Repository.CalcPrice(Repository.History.LuxuryGoods, Repository.Tracking.LuxuryGoods);
+            Repository.Prices.LuxuryGoods = (int)Repository.Tracking.LuxuryGoods;
+
+            await Clients.Caller.SendAsync("empireSynced", empire);
         }
     }
 }
