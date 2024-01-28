@@ -2,6 +2,7 @@ export enum Views {
   CreateEmpireForm,
   MyEmpires,
   EmpireView,
+  CreateUserForm,
 }
 
 export type Switcher = (nextView: Views) => void;
@@ -21,8 +22,16 @@ export type MarketplacePrices = {
   luxuryGoods: number;
 };
 
+export type User = {
+  username: string;
+  userId: string;
+  editKey: string;
+};
+
 export type Empire = {
   id: string;
+  username: string;
+  userId: string;
   name: string;
   laughter: number;
   citizens: number;
@@ -44,6 +53,8 @@ export type Empire = {
 
 export type OtherEmpire = {
   id: string;
+  username: string;
+  userId: string;
   name: string;
   strength: number;
 };

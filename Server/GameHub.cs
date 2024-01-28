@@ -4,12 +4,82 @@ namespace Rmg;
 
 public class GameHub : Hub
 {
-    private static Dictionary<Guid, string> empireClientMap = [];
-    public async Task CreateEmpire(string name)
+    private static Dictionary<Guid, List<string>> empireClientMap = [];
+    private static Dictionary<string, List<Guid>> clientEmpireMap = [];
+    private static Dictionary<Guid, List<Guid>> userEmpireMap = [];
+
+    public override async Task OnConnectedAsync()
     {
+        if (!clientEmpireMap.ContainsKey(Context.ConnectionId))
+            clientEmpireMap.Add(Context.ConnectionId, []);
+
+        await base.OnConnectedAsync();
+    }
+
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        foreach (var empireId in clientEmpireMap[Context.ConnectionId])
+        {
+            empireClientMap[empireId].RemoveAll(x => x == Context.ConnectionId);
+        }
+
+        clientEmpireMap.Remove(Context.ConnectionId);
+        await base.OnDisconnectedAsync(exception);
+    }
+
+    public async Task CreateUser(string username)
+    {
+        User user;
+        if (Repository.UsersByName.ContainsKey(username))
+        {
+            Guid userId = Repository.UsersByName[username];
+            user = Repository.Users[userId];
+        }
+        else
+        {
+            Guid userId = Guid.NewGuid();
+            user = new User
+            {
+                Username = username,
+                UserId = userId,
+                EditKey = Guid.NewGuid()
+            };
+
+            Repository.Users.Add(userId, user);
+
+            userEmpireMap.Add(userId, []);
+            Repository.UsersByName.Add(username, userId);
+        }
+
+        await Clients.Caller.SendAsync("userCreated", user);
+    }
+
+    public async Task RequestMyEmpires(Guid userId)
+    {
+        Console.WriteLine(userId);
+        List<Guid> empireIds = userEmpireMap[userId];
+        foreach (var id in empireIds)
+        {
+            Console.WriteLine(id);
+        }
+        List<Empire> empires = empireIds.Select(x => Repository.Empires[x]).ToList();
+        foreach (var e in empires)
+        {
+            Console.WriteLine(e.Name);
+        }
+
+        await Clients.Caller.SendAsync("myEmpiresRequested", empires);
+    }
+
+    public async Task CreateEmpire(string name, Guid userId)
+    {
+        Console.WriteLine(userId);
+        User user = Repository.Users[userId];
         Empire empire = new()
         {
             Id = Guid.NewGuid(),
+            UserId = userId,
+            Username = user.Username,
             Name = name,
             LastUpdate = DateTime.UtcNow,
             Prices = Repository.Prices
@@ -17,14 +87,23 @@ public class GameHub : Hub
 
         Repository.Empires.Add(empire.Id, empire);
 
-        empireClientMap.Add(empire.Id, Context.ConnectionId);
+        if (!empireClientMap.ContainsKey(empire.Id))
+            empireClientMap.Add(empire.Id, []);
+        empireClientMap[empire.Id].Add(Context.ConnectionId);
+
+        clientEmpireMap[Context.ConnectionId].Add(empire.Id);
+
+        userEmpireMap[userId].Add(empire.Id);
 
         await Clients.Caller.SendAsync("empireSynced", empire);
     }
 
-    public void DeleteEmpire(Guid id)
+    public void DeleteEmpire(Guid id, Guid userId)
     {
         Repository.Empires.Remove(id);
+        empireClientMap.Remove(id);
+        clientEmpireMap[Context.ConnectionId].RemoveAll(x => x == id);
+        userEmpireMap[userId].RemoveAll(x => x == id);
     }
 
     public async void RequestEmpires(Guid except)
@@ -36,6 +115,8 @@ public class GameHub : Hub
                 return new OtherEmpire
                 {
                     Id = x.Value.Id,
+                    UserId = x.Value.UserId,
+                    Username = x.Value.Username,
                     Name = x.Value.Name,
                     Strength = x.Value.Strength
                 };
@@ -110,10 +191,10 @@ public class GameHub : Hub
 
         await Clients.Caller.SendAsync("empireSynced", me);
 
-        string theirClientId = empireClientMap[them.Id];
-        var client = Clients.Clients(theirClientId);
-        if (client is not null)
-            await client.SendAsync("empireSynced", them);
+        List<string> theirClientIds = empireClientMap[them.Id];
+        var clients = Clients.Clients(theirClientIds);
+        if (clients is not null)
+            await clients.SendAsync("empireSynced", them);
     }
 
     public void DismissNotification(Guid empireId, Guid notificationId)
@@ -294,10 +375,10 @@ public class GameHub : Hub
 
     private async Task SyncEmpire(Empire other)
     {
-        string theirClientId = empireClientMap[other.Id];
-        var client = Clients.Clients(theirClientId);
-        if (client is not null)
-            await client.SendAsync("empireSynced", other);
+        List<string> theirClientIds = empireClientMap[other.Id];
+        var clients = Clients.Clients(theirClientIds);
+        if (clients is not null)
+            await clients.SendAsync("empireSynced", other);
     }
 
     public async Task GiftFood(Guid from, Guid to, int amount)

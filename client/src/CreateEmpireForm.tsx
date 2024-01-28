@@ -1,24 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { getConnection } from "./signalRConnection";
-import { Switcher, Empire, Views } from "./types";
+import { Switcher, Empire, Views, User } from "./types";
 
 type CreateEmpireFormProps = {
   switcher: Switcher;
-  myEmpires: Empire[];
-  setMyEmpires: React.Dispatch<React.SetStateAction<Empire[]>>;
+  setMyEmpires: React.Dispatch<React.SetStateAction<Empire[] | null>>;
+  user: User;
 };
 
 export const CreateEmpireForm: React.FC<CreateEmpireFormProps> = ({
   switcher,
-  myEmpires,
   setMyEmpires,
+  user,
 }) => {
   const { createEmpire, subEmpireSynced } = getConnection();
   const [name, setName] = useState("");
 
   useEffect(() => {
     const cleanup = subEmpireSynced((empire: Empire) => {
-      setMyEmpires([empire, ...myEmpires]);
+      setMyEmpires(null); // so they will be refreshed
       switcher(Views.MyEmpires);
     });
 
@@ -39,7 +39,7 @@ export const CreateEmpireForm: React.FC<CreateEmpireFormProps> = ({
         value={name}
         onChange={(e) => setName(e.target.value)}
       ></input>
-      <a onClick={() => createEmpire(name)}>Create Empire</a>
+      <a onClick={() => createEmpire(name, user.userId)}>Create Empire</a>
     </>
   );
 };

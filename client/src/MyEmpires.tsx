@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { getConnection } from "./signalRConnection";
-import { Switcher, Empire, Views } from "./types";
+import { Switcher, Empire, Views, User } from "./types";
 
 type MyEmpiresProps = {
   switcher: Switcher;
-  myEmpires: Empire[];
-  setMyEmpires: React.Dispatch<React.SetStateAction<Empire[]>>;
+  myEmpires: Empire[] | null;
+  setMyEmpires: React.Dispatch<React.SetStateAction<Empire[] | null>>;
   setActiveId: React.Dispatch<React.SetStateAction<string | null>>;
+  user: User;
 };
 
 export const MyEmpires: React.FC<MyEmpiresProps> = ({
@@ -14,15 +15,29 @@ export const MyEmpires: React.FC<MyEmpiresProps> = ({
   myEmpires,
   setMyEmpires,
   setActiveId,
+  user,
 }) => {
-  const { deleteEmpire } = getConnection();
+  const { deleteEmpire, requestMyEmpires, subMyEmpiresRequested } =
+    getConnection();
+
+  useEffect(() => {
+    if (!myEmpires) {
+      requestMyEmpires(user.userId);
+    }
+  });
+
+  useEffect(() => {
+    const cleanup = subMyEmpiresRequested((empires: Empire[]) => {
+      console.log(empires);
+      setMyEmpires(empires);
+    });
+
+    return () => cleanup();
+  });
 
   const removeEmpire = (id: string) => {
-    deleteEmpire(id);
-    const index = myEmpires.findIndex((x) => x.id === id);
-    const updatedEmpires = [...myEmpires];
-    updatedEmpires.splice(index, 1);
-    setMyEmpires(updatedEmpires);
+    deleteEmpire(id, user.userId);
+    setMyEmpires(null); // might make a race condition or flickering
   };
 
   const open = (id: string) => {
@@ -31,30 +46,32 @@ export const MyEmpires: React.FC<MyEmpiresProps> = ({
   };
 
   return (
-    <>
-      <p>My Empires</p>
-      <p>==========</p>
-      <table>
-        <tbody>
-          {myEmpires.map((i) => (
-            <tr key={i.id}>
-              <td>{i.name}</td>
-              <td>&nbsp;</td>
-              <td>
-                <a onClick={() => open(i.id)}>Open...</a>
-              </td>
-              <td>
-                <a onClick={() => removeEmpire(i.id)}>Delete</a>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <ul></ul>
-      <br />
-      <div>
-        <a onClick={() => switcher(Views.CreateEmpireForm)}>New Empire...</a>
-      </div>
-    </>
+    myEmpires && (
+      <>
+        <p>My Empires</p>
+        <p>==========</p>
+        <table>
+          <tbody>
+            {myEmpires.map((i) => (
+              <tr key={i.id}>
+                <td>{i.name}</td>
+                <td>&nbsp;</td>
+                <td>
+                  <a onClick={() => open(i.id)}>Open...</a>
+                </td>
+                <td>
+                  <a onClick={() => removeEmpire(i.id)}>Delete</a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <ul></ul>
+        <br />
+        <div>
+          <a onClick={() => switcher(Views.CreateEmpireForm)}>New Empire...</a>
+        </div>
+      </>
+    )
   );
 };

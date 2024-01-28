@@ -9,6 +9,9 @@ public static class Repository
     public static MarketplacePrices Prices = new();
     public static TrackingPrices Tracking = new();
 
+    public static Dictionary<Guid, User> Users = [];
+    public static Dictionary<string, Guid> UsersByName = [];
+
     public static PriceHistory History = new();
 
     public static void RecordHistory(List<DateQuantity> list, DateTime date, int quantity)

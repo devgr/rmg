@@ -1,5 +1,5 @@
 import * as signalR from "@microsoft/signalr";
-import { Empire, OtherEmpire } from "./types";
+import { Empire, OtherEmpire, User } from "./types";
 
 const URL = process.env.HUB_ADDRESS ?? "http://localhost:5209/api";
 
@@ -31,6 +31,30 @@ class Connector {
     };
   };
 
+  public subUserCreated = (callback: (user: User) => void) => {
+    this.connection.on("userCreated", callback);
+
+    return () => {
+      this.connection.off("userCreated", callback);
+    };
+  };
+
+  public subMyEmpiresRequested = (callback: (empires: Empire[]) => void) => {
+    this.connection.on("myEmpiresRequested", callback);
+
+    return () => {
+      this.connection.off("myEmpiresRequested", callback);
+    };
+  };
+
+  public createUser = (username: string) => {
+    this.connection.send("createUser", username);
+  };
+
+  public requestMyEmpires = (userId: string) => {
+    this.connection.send("requestMyEmpires", userId);
+  };
+
   public dismissNotification = (empireId: string, notificationId: string) => {
     this.connection.send("dismissNotification", empireId, notificationId);
   };
@@ -43,12 +67,12 @@ class Connector {
     this.connection.send("attack", from, to, risk);
   };
 
-  public createEmpire = (name: string) => {
-    this.connection.send("createEmpire", name);
+  public createEmpire = (name: string, userId: string) => {
+    this.connection.send("createEmpire", name, userId);
   };
 
-  public deleteEmpire = (id: string) => {
-    this.connection.send("deleteEmpire", id);
+  public deleteEmpire = (id: string, userId: string) => {
+    this.connection.send("deleteEmpire", id, userId);
   };
 
   public syncEmpire = (id: string) => {

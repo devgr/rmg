@@ -2,9 +2,18 @@ namespace Rmg;
 
 using DateQuantity = (DateTime Date, int Quantity);
 
+public record User
+{
+    public required string Username { get; set; }
+    public required Guid UserId { get; set; }
+    public required Guid EditKey { get; set; }
+}
+
 public record Empire
 {
     public required Guid Id { get; set; }
+    public required string Username { get; set; }
+    public required Guid UserId { get; set; }
     public required string Name { get; set; }
     public required DateTime LastUpdate { get; set; }
     public int Laughter { get; set; } = 100;
@@ -67,6 +76,8 @@ public record PriceHistory
 public record OtherEmpire
 {
     public required Guid Id { get; set; }
+    public required string Username { get; set; }
+    public required Guid UserId { get; set; }
     public required string Name { get; set; }
     public int Strength { get; set; } = 0;
 }
